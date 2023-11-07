@@ -70,7 +70,7 @@ def split_test_train(current_db, FilenameForTrain, FilenameForTest):
 
 arg = sys.argv[1]
 deep_ini_file = arg[len("--default-name="):]
-InsertParamsInCGP(cgp_parameters_file, deep_ini_file)
+InsertParamsInCGP(deep_ini_file[deep_ini_file.index("."):]+cgp_parameters_file, deep_ini_file)
 
 
 current_db_big = np.load('D:/ABCDECGP/Connection/start_seedling_complete_maturing_big_all.npy').astype(float)
@@ -80,13 +80,12 @@ split_test_train(current_db_tiny, train_tiny_file, test_tiny_file)
 
 
 subprocess.call(cgp_exe_name + ' 1 '+ cgp_parameters_file +' '+train_big_file+' '+train_tiny_file, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=False)
-
-
 proc = subprocess.Popen([cgp_exe_name, '3', cgp_parameters_file, train_big_file,train_tiny_file, test_big_file, test_tiny_file], stdout=subprocess.PIPE)
+
 val = proc.communicate()[0].decode("utf-8")
 
 import numpy as np
-errors = [float(s.split(",")[1]) for s in test.split("\n")]
+errors = [float(s.split(",")[1]) for s in val.split("\n") if len(s.split(",")) == 3]
 error = np.mean(errors)
 print(":"+str(error))
 #split_val = [float(s) for s in val.split()]
