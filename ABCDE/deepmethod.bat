@@ -1,0 +1,1 @@
+py D:\ABCDECGP\Connection\connect.py %1=%2
