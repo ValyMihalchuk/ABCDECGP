@@ -1,4 +1,3 @@
-[CGP]
 numInputsLeft = 150;
 numInputsRight = 157;
 numNodes = 5045;
