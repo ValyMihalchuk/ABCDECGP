@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
+#include <time.h>
 #include "cgp.h"
-
 
 double maximum(double num[], int size)
 {
@@ -68,10 +69,41 @@ double SS_res(double a[], int n)
 	return sum;
 }
 
+
+
+void shuffle(int **train_index, int**test_index, int n, double alpha)
+{
+
+	int* array = malloc(n);
+	for (int i = 0; i < n; i++) {
+		array[i] = i;
+	}
+
+	if (n > 1)
+	{
+		size_t i;
+		for (i = 0; i < n - 1; i++)
+		{
+			size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+			int t = array[j];
+			array[j] = array[i];
+			array[i] = t;
+		}
+	}
+
+
+	*train_index = array;
+	int end_train = n * alpha;
+	*test_index = array + end_train;
+
+}
+
 #define OPERATION_OPTB0 0
 #define OPERATION_OPTB1 1
 #define OPERATION_PRINT 2
 #define OPERATION_TEST 3
+#define OPERATION_ABCDE 4
+
 
 char usage_string[256] = \
 "Usage: cgpapp <mode> <parameters file>;\n" \
@@ -117,66 +149,115 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 
-	fscanf(pFile, "numInputsLeft = %i;\n", &numInputsLeft);
-	fscanf(pFile, "numInputsRight = %i;\n", &numInputsRight);
-	fscanf(pFile, "numNodes = %i;\n", &numNodes);
-	fscanf(pFile, "numOutputs = %i;\n", &numOutputs);
-	fscanf(pFile, "nodeArity = %i;\n", &nodeArity);
-	fscanf(pFile, "numGens = %i;\n", &numGens);
-	fscanf(pFile, "targetFitness = %lf;\n", &targetFitness);
-	fscanf(pFile, "updateFrequency = %i;\n", &updateFrequency);
-	fscanf(pFile, "maxMutationConst = %lf;\n", &maxMutationConst);
-	fscanf(pFile, "numLevels = %i;\n", &numLevels);
-	fscanf(pFile, "levelCoeff = %lf;\n", &levelCoeff);
-	fscanf(pFile, "numGensInt = %i;\n", &numGensInt);
+
+
+	fseek(pFile, 0, SEEK_END);
+	long size = ftell(pFile);
+	fseek(pFile, 0, SEEK_SET);
+	char* fcontent = malloc(size);
+	fread(fcontent, 1, size, pFile);
+	char* istr = strstr(fcontent, "[CGP]");
+	int position = istr - fcontent + strlen("[CGP]\n");
+
+	free(fcontent);
+
+	
+
+	fseek(pFile, position, SEEK_SET);
+
+
+
+	fscanf(pFile, "numInputsLeft=%i;\n", &numInputsLeft);
+	fscanf(pFile, "numInputsRight=%i;\n", &numInputsRight);
+	fscanf(pFile, "numNodes=%i;\n", &numNodes);
+	fscanf(pFile, "numOutputs=%i;\n", &numOutputs);
+	fscanf(pFile, "nodeArity=%i;\n", &nodeArity);
+	fscanf(pFile, "numGens=%i;\n", &numGens);
+	fscanf(pFile, "targetFitness=%lf;\n", &targetFitness);
+	fscanf(pFile, "updateFrequency=%i;\n", &updateFrequency);
+	fscanf(pFile, "maxMutationConst=%lf;\n", &maxMutationConst);
+	fscanf(pFile, "numLevels=%i;\n", &numLevels);
+	fscanf(pFile, "levelCoeff=%lf;\n", &levelCoeff);
+	fscanf(pFile, "numGensInt=%i;\n", &numGensInt);
+
+
+
+
 
 	double* defaultSimpleConstantsLeft = malloc(numInputsLeft * sizeof(double));
 
 	fscanf(pFile, "\n", NULL);
+
+
 	for (int i = 0; i < numInputsLeft; ++i) {
-		fscanf(pFile, "%lf;\n", &defaultSimpleConstantsLeft[i]);
-		// printf("%lf ", defaultSimpleConstants[i]);
+
+
+		int y;
+		fscanf(pFile, "defaultSimpleConstantsLeft%i=%lf;\n", &y, &defaultSimpleConstantsLeft[i]);
+
+		//printf(" defaultSimpleConstantsLeft %i = %lf \n", i, defaultSimpleConstantsLeft[i]);
 	}
+
+
 
 	fscanf(pFile, "\n", NULL);
 	// printf("\n");
 	double* shiftForSigmoidLeft = malloc(numInputsLeft * sizeof(double));
 	for (int i = 0; i < numInputsLeft; ++i) {
-		fscanf(pFile, "%lf;\n", &shiftForSigmoidLeft[i]);
-		// printf("%lf ", shiftForSigmoid[i]);
+		int y;
+		fscanf(pFile, "shiftForSigmoidLeft%i=%lf;\n", &y, &shiftForSigmoidLeft[i]);
+		//printf(" shiftForSigmoidLeft%i = %lf\n ", i, shiftForSigmoidLeft[i]);
 	}
 
 	fscanf(pFile, "\n", NULL);
+
+
 	// printf("\n");
 	double* scaleForSigmoidLeft = malloc(numInputsLeft * sizeof(double));
 	for (int i = 0; i < numInputsLeft; ++i) {
-		fscanf(pFile, "%lf;\n", &scaleForSigmoidLeft[i]);
-		// printf("%lf ", scaleForSigmoid[i]);
+		int y;
+		fscanf(pFile, "scaleForSigmoidLeft%i=%lf;\n", &y, &scaleForSigmoidLeft[i]);
+		//printf("scaleForSigmoidLeft%i = %lf \n", i, scaleForSigmoidLeft[i]);
 	}
 
+
+	fscanf(pFile, "\n", NULL);
 	double* defaultSimpleConstantsRight = malloc(numInputsRight * sizeof(double));
 
 	for (int i = 0; i < numInputsRight; ++i) {
-		fscanf(pFile, "%lf;\n", &defaultSimpleConstantsRight[i]);
-		// printf("%lf ", defaultSimpleConstants[i]);
+		int y;
+		fscanf(pFile, "defaultSimpleConstantsRight%i=%lf;\n", &y, &defaultSimpleConstantsRight[i]);
+		//printf("defaultSimpleConstantsRight%i = %lf \n", i, defaultSimpleConstantsRight[i]);
 	}
 
 	fscanf(pFile, "\n", NULL);
 	// printf("\n");
 	double* shiftForSigmoidRight = malloc(numInputsRight * sizeof(double));
 	for (int i = 0; i < numInputsRight; ++i) {
-		fscanf(pFile, "%lf;\n", &shiftForSigmoidRight[i]);
-		// printf("%lf ", shiftForSigmoid[i]);
+		int y;
+		fscanf(pFile, "shiftForSigmoidRight%i=%lf;\n", &y, &shiftForSigmoidRight[i]);
+		//printf("shiftForSigmoidRight%i=%lf \n", i, shiftForSigmoidRight[i]);
 	}
 
 	fscanf(pFile, "\n", NULL);
 	// printf("\n");
 	double* scaleForSigmoidRight = malloc(numInputsRight * sizeof(double));
 	for (int i = 0; i < numInputsRight; ++i) {
-		fscanf(pFile, "%lf;\n", &scaleForSigmoidRight[i]);
-		// printf("%lf ", scaleForSigmoid[i]);
+		int y;
+		fscanf(pFile, "scaleForSigmoidRight%i=%lf;\n", &y, &scaleForSigmoidRight[i]);
+		//printf("scaleForSigmoidRight%i=%lf \n", i, scaleForSigmoidRight[i]);
 	}
 	fclose(pFile);
+
+
+
+
+	
+
+
+
+
+
 
 	if (operation_mode == OPERATION_OPTB0) {
 
@@ -552,5 +633,85 @@ int main(int argc, char** argv) {
 		freeDataSet(data);
 	}
 
+
+	if (operation_mode = OPERATION_ABCDE)
+	{
+
+		char* full_filename = NULL;
+		
+		if (argc > 3) {
+			full_filename = argv[3];
+		}
+		else {
+			fprintf(stderr, "\n Incorrect input \n");
+			return 0;
+		}
+		struct dataSet *Data = NULL;
+		Data = initialiseDataSetFromFile(full_filename);
+		srand(time(NULL));
+
+		int N = getDataSetNumSamples(Data);
+		double alpha = 0.75;
+		int* test_index = 0;
+		int* train_index = 0;
+		shuffle(&train_index, &test_index, N, alpha);
+
+		int train_N = N * alpha;
+		int test_N = N - train_N;
+
+
+		int i;
+
+		struct dataSet *data_train = NULL;
+		struct dataSet *data_test = NULL;
+
+		double** inputs_train=malloc(sizeof(double)*N);
+		double** outputs_train=malloc(sizeof(double)*N);
+
+
+		printf("OK");
+		int ik;
+		ik= 0;
+		for (int tmp = 0; tmp < train_N; tmp++)
+		{
+			inputs_train[ik] = getDataSetSampleInputs(Data, train_index[tmp]);
+			outputs_train[ik] = getDataSetSampleOutputs(Data, train_index[tmp]);
+
+			printf("%lf", outputs_train[ik][0]);
+			ik++;
+		}
+	
+
+		int NUMINPUTS = numInputsLeft;
+		int NUMOUTPUTS = 1;
+
+		printf("OK! %i", NUMINPUTS);
+		data_train = initialiseDataSetFromArrays(NUMINPUTS, NUMOUTPUTS, train_N, inputs_train[0], outputs_train[0]);
+		printf("OK! %i", NUMINPUTS);
+
+		double** inputs_test = malloc(sizeof(double)*N);
+		double** outputs_test = malloc(sizeof(double)*N);
+
+		printf("\n\n TEST OUTPUT");
+		ik = 0;
+		for (int tmp = 0; tmp < test_N; tmp++)
+		{
+			inputs_test[ik] = getDataSetSampleInputs(Data, test_index[tmp]);
+			outputs_test[ik] = getDataSetSampleOutputs(Data, test_index[tmp]);
+
+
+			//printf("%lf", outputs_test[ik][0]);
+			ik++;
+		}
+
+		data_test = initialiseDataSetFromArrays(NUMINPUTS, NUMOUTPUTS, test_N, inputs_test[0], outputs_test[0]);
+
+
+		saveDataSet(data_train, "testtest.data");
+	}
+
 	return 0;
 }
+
+
+
