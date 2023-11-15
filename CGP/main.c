@@ -650,17 +650,26 @@ int main(int argc, char** argv) {
 		Data = initialiseDataSetFromFile(full_filename);
 		srand(time(NULL));
 
+
+		//saveDataSet(Data, "input.data");
+	
+
+
 		int N = getDataSetNumSamples(Data);
+
+		printf(">>%i", N);
 		double alpha = 0.75;
 		int* test_index = 0;
 		int* train_index = 0;
 		shuffle(&train_index, &test_index, N, alpha);
+	
+
 
 		int train_N = N * alpha;
 		int test_N = N - train_N;
 
+		printf("\n OK %i %i", train_N, test_N);
 
-		int i;
 
 		struct dataSet *data_train = NULL;
 		struct dataSet *data_test = NULL;
@@ -668,26 +677,35 @@ int main(int argc, char** argv) {
 		double** inputs_train=malloc(sizeof(double)*N);
 		double** outputs_train=malloc(sizeof(double)*N);
 
+		//double inputs_train[153][7];
+		//double outputs_train[153][1];
+		printf("\n__");
 
-		printf("OK");
 		int ik;
 		ik= 0;
 		for (int tmp = 0; tmp < train_N; tmp++)
 		{
+			printf("\n");
+	
 			inputs_train[ik] = getDataSetSampleInputs(Data, train_index[tmp]);
 			outputs_train[ik] = getDataSetSampleOutputs(Data, train_index[tmp]);
+			
+			for (int m = 0; m < numInputsLeft; m++)
+				printf("%lf ", inputs_train[ik][m]);
 
-			printf("%lf", outputs_train[ik][0]);
+
+			printf("\n%lf", outputs_train[ik][0]);
 			ik++;
 		}
-	
 
 		int NUMINPUTS = numInputsLeft;
 		int NUMOUTPUTS = 1;
 
 		printf("OK! %i", NUMINPUTS);
-		data_train = initialiseDataSetFromArrays(NUMINPUTS, NUMOUTPUTS, train_N, inputs_train[0], outputs_train[0]);
+		data_train = initialiseDataSetFromArrays(NUMINPUTS, NUMOUTPUTS, train_N, inputs_train, outputs_train);
 		printf("OK! %i", NUMINPUTS);
+
+		saveDataSet(data_train, "train.data");
 
 		double** inputs_test = malloc(sizeof(double)*N);
 		double** outputs_test = malloc(sizeof(double)*N);
@@ -704,10 +722,10 @@ int main(int argc, char** argv) {
 			ik++;
 		}
 
-		data_test = initialiseDataSetFromArrays(NUMINPUTS, NUMOUTPUTS, test_N, inputs_test[0], outputs_test[0]);
+		data_test = initialiseDataSetFromArrays(NUMINPUTS, NUMOUTPUTS, test_N, inputs_test, outputs_test);
+		saveDataSet(data_test, "test.data");
 
 
-		saveDataSet(data_train, "testtest.data");
 	}
 
 	return 0;

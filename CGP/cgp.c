@@ -2607,7 +2607,7 @@ static void sortChromosomeArray(struct chromosome **chromoArray, int numChromos)
 	inputs[numSamples][numInputs]
 	outputs[numSamples][numOutputs]
 */
-DLL_EXPORT struct dataSet *initialiseDataSetFromArrays(int numInputs, int numOutputs, int numSamples, double *inputs, double *outputs) {
+DLL_EXPORT struct dataSet *initialiseDataSetFromArrays(int numInputs, int numOutputs, int numSamples, double **inputs, double **outputs) {
 
 	int i, j;
 	struct dataSet *data;
@@ -2628,11 +2628,13 @@ DLL_EXPORT struct dataSet *initialiseDataSetFromArrays(int numInputs, int numOut
 		data->outputData[i] = (double*)malloc(data->numOutputs * sizeof(double));
 
 		for (j = 0; j < data->numInputs; j++) {
-			data->inputData[i][j] = inputs[(i * data->numInputs) + j];
+			//data->inputData[i][j] = inputs[(i * data->numInputs) + j];
+			data->inputData[i][j] = inputs[i][j];
 		}
 
 		for (j = 0; j < data->numOutputs; j++) {
-			data->outputData[i][j] = outputs[(i * data->numOutputs) + j];
+			//data->outputData[i][j] = outputs[(i * data->numOutputs) + j];
+			data->outputData[i][j] = outputs[i][j];
 		}
 	}
 
@@ -2839,7 +2841,13 @@ DLL_EXPORT int getNumDataSetSamples(struct dataSet *data) {
 	returns the inputs of the given sample of the given dataSet
 */
 DLL_EXPORT double *getDataSetSampleInputs(struct dataSet *data, int sample) {
-	return data->inputData[sample];
+	if (sample < data->numSamples)
+		return data->inputData[sample];
+	else
+	{
+		fprintf(stderr, "error");
+		exit(1);
+	}
 }
 
 

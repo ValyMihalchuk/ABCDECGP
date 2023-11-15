@@ -1539,7 +1539,7 @@ extern "C" {
 		See Also:
 			<freeDataSet>, <initialiseDataSetFromFile>, <printDataSet>
 	*/
-	DLL_EXPORT struct dataSet *initialiseDataSetFromArrays(int numInputs, int numOutputs, int numSamples, double *inputs, double *outputs);
+	DLL_EXPORT struct dataSet *initialiseDataSetFromArrays(int numInputs, int numOutputs, int numSamples, double **inputs, double **outputs);
 
 
 	/*
