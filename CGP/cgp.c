@@ -40,6 +40,9 @@
 #define SELECTIONSCHEMENAMELENGTH 21
 #define REPRODUCTIONSCHEMENAMELENGTH 21
 
+
+
+extern FILE* STDOUT_;
 /*
 	Structure definitions
 */
@@ -305,7 +308,7 @@ DLL_EXPORT void freeParameters(struct parameters *params) {
 
 	/* attempt to prevent user double freeing */
 	if (params == NULL) {
-		printf("Warning: double freeing of parameters prevented.\n");
+		fprintf(STDOUT_,"Warning: double freeing of parameters prevented.\n");
 		return;
 	}
 
@@ -319,31 +322,31 @@ DLL_EXPORT void freeParameters(struct parameters *params) {
 DLL_EXPORT void printParameters(struct parameters *params) {
 
 	if (params == NULL) {
-		printf("Error: cannot print uninitialised parameters.\nTerminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot print uninitialised parameters.\nTerminating CGP-Library.\n");
 		exit(0);
 	}
 
-	printf("-----------------------------------------------------------\n");
-	printf("                       Parameters                          \n");
-	printf("-----------------------------------------------------------\n");
-	printf("Evolutionary Strategy:\t\t\t(%d%c%d)-ES\n", params->mu, params->evolutionaryStrategy, params->lambda);
-	printf("Inputs:\t\t\t\t\t%d\n", params->numInputs);
-	printf("Nodes:\t\t\t\t\t%d\n", params->numNodes);
-	printf("Outputs:\t\t\t\t%d\n", params->numOutputs);
-	printf("Node Arity:\t\t\t\t%d\n", params->arity);
-	printf("Connection weights range:\t\t+/- %f\n", params->connectionWeightRange);
-	printf("Mutation Type:\t\t\t\t%s\n", params->mutationTypeName);
-	printf("Mutation rate:\t\t\t\t%f\n", params->mutationRate);
-	printf("Recurrent Connection Probability:\t%f\n", params->recurrentConnectionProbability);
-	printf("Shortcut Connections:\t\t\t%d\n", params->shortcutConnections);
-	printf("Fitness Function:\t\t\t%s\n", params->fitnessFunctionName);
-	printf("Target Fitness:\t\t\t\t%f\n", params->targetFitness);
-	printf("Selection scheme:\t\t\t%s\n", params->selectionSchemeName);
-	printf("Reproduction scheme:\t\t\t%s\n", params->reproductionSchemeName);
-	printf("Update frequency:\t\t\t%d\n", params->updateFrequency);
-	printf("Threads:\t\t\t%d\n", params->numThreads);
+	fprintf(STDOUT_,"-----------------------------------------------------------\n");
+	fprintf(STDOUT_,"                       Parameters                          \n");
+	fprintf(STDOUT_,"-----------------------------------------------------------\n");
+	fprintf(STDOUT_,"Evolutionary Strategy:\t\t\t(%d%c%d)-ES\n", params->mu, params->evolutionaryStrategy, params->lambda);
+	fprintf(STDOUT_,"Inputs:\t\t\t\t\t%d\n", params->numInputs);
+	fprintf(STDOUT_,"Nodes:\t\t\t\t\t%d\n", params->numNodes);
+	fprintf(STDOUT_,"Outputs:\t\t\t\t%d\n", params->numOutputs);
+	fprintf(STDOUT_,"Node Arity:\t\t\t\t%d\n", params->arity);
+	fprintf(STDOUT_,"Connection weights range:\t\t+/- %f\n", params->connectionWeightRange);
+	fprintf(STDOUT_,"Mutation Type:\t\t\t\t%s\n", params->mutationTypeName);
+	fprintf(STDOUT_,"Mutation rate:\t\t\t\t%f\n", params->mutationRate);
+	fprintf(STDOUT_,"Recurrent Connection Probability:\t%f\n", params->recurrentConnectionProbability);
+	fprintf(STDOUT_,"Shortcut Connections:\t\t\t%d\n", params->shortcutConnections);
+	fprintf(STDOUT_,"Fitness Function:\t\t\t%s\n", params->fitnessFunctionName);
+	fprintf(STDOUT_,"Target Fitness:\t\t\t\t%f\n", params->targetFitness);
+	fprintf(STDOUT_,"Selection scheme:\t\t\t%s\n", params->selectionSchemeName);
+	fprintf(STDOUT_,"Reproduction scheme:\t\t\t%s\n", params->reproductionSchemeName);
+	fprintf(STDOUT_,"Update frequency:\t\t\t%d\n", params->updateFrequency);
+	fprintf(STDOUT_,"Threads:\t\t\t%d\n", params->numThreads);
 	printFunctionSet(params);
-	printf("-----------------------------------------------------------\n\n");
+	fprintf(STDOUT_,"-----------------------------------------------------------\n\n");
 }
 
 
@@ -375,7 +378,7 @@ DLL_EXPORT void addNodeFunction(struct parameters *params, char const *functionN
 
 	/* if the function set is empty give warning */
 	if (params->funcSet->numFunctions == 0) {
-		printf("Warning: No Functions added to function set.\n");
+		fprintf(STDOUT_,"Warning: No Functions added to function set.\n");
 	}
 }
 
@@ -387,7 +390,7 @@ DLL_EXPORT void addNodeFunction(struct parameters *params, char const *functionN
 DLL_EXPORT void addCustomNodeFunction(struct parameters *params, double(*function)(const int numInputs, const double *inputs, const double *weights, double simpleConstant), char const *functionName, int maxNumInputs) {
 
 	if (params->funcSet->numFunctions >= FUNCTIONSETSIZE) {
-		printf("Warning: functions set has reached maximum capacity (%d). Function '%s' not added.\n", FUNCTIONSETSIZE, functionName);
+		fprintf(STDOUT_,"Warning: functions set has reached maximum capacity (%d). Function '%s' not added.\n", FUNCTIONSETSIZE, functionName);
 		return;
 	}
 
@@ -516,7 +519,7 @@ static int addPresetFunctionToFunctionSet(struct parameters *params, char const 
 	}
 
 	else {
-		printf("Warning: function '%s' is not known and was not added.\n", functionName);
+		fprintf(STDOUT_,"Warning: function '%s' is not known and was not added.\n", functionName);
 		successfullyAdded = 0;
 	}
 
@@ -539,7 +542,7 @@ DLL_EXPORT void setNumInputs(struct parameters *params, int numInputs) {
 
 	/* error checking */
 	if (numInputs <= 0) {
-		printf("Error: number of chromosome inputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numInputs);
+		fprintf(STDOUT_,"Error: number of chromosome inputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numInputs);
 		exit(0);
 	}
 
@@ -554,7 +557,7 @@ DLL_EXPORT void setNumNodes(struct parameters *params, int numNodes) {
 
 	/* error checking */
 	if (numNodes < 0) {
-		printf("Warning: number of chromosome nodes cannot be negative; %d is invalid.\nTerminating CGP-Library.\n", numNodes);
+		fprintf(STDOUT_,"Warning: number of chromosome nodes cannot be negative; %d is invalid.\nTerminating CGP-Library.\n", numNodes);
 		exit(0);
 	}
 
@@ -569,7 +572,7 @@ DLL_EXPORT void setNumOutputs(struct parameters *params, int numOutputs) {
 
 	/* error checking */
 	if (numOutputs < 0) {
-		printf("Warning: number of chromosome outputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numOutputs);
+		fprintf(STDOUT_,"Warning: number of chromosome outputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numOutputs);
 		exit(0);
 	}
 
@@ -584,7 +587,7 @@ DLL_EXPORT void setArity(struct parameters *params, int arity) {
 
 	/* error checking */
 	if (arity < 0) {
-		printf("Warning: node arity cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", arity);
+		fprintf(STDOUT_,"Warning: node arity cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", arity);
 		exit(0);
 	}
 
@@ -602,7 +605,7 @@ DLL_EXPORT void setMu(struct parameters *params, int mu) {
 		params->mu = mu;
 	}
 	else {
-		printf("\nWarning: mu value '%d' is invalid. Mu value must have a value of one or greater. Mu value left unchanged as '%d'.\n", mu, params->mu);
+		fprintf(STDOUT_,"\nWarning: mu value '%d' is invalid. Mu value must have a value of one or greater. Mu value left unchanged as '%d'.\n", mu, params->mu);
 	}
 }
 
@@ -618,7 +621,7 @@ DLL_EXPORT void setLambda(struct parameters *params, int lambda) {
 		params->lambda = lambda;
 	}
 	else {
-		printf("\nWarning: lambda value '%d' is invalid. Lambda value must have a value of one or greater. Lambda value left unchanged as '%d'.\n", lambda, params->lambda);
+		fprintf(STDOUT_,"\nWarning: lambda value '%d' is invalid. Lambda value must have a value of one or greater. Lambda value left unchanged as '%d'.\n", lambda, params->lambda);
 	}
 }
 
@@ -634,7 +637,7 @@ DLL_EXPORT void setEvolutionaryStrategy(struct parameters *params, char evolutio
 		params->evolutionaryStrategy = evolutionaryStrategy;
 	}
 	else {
-		printf("\nWarning: the evolutionary strategy '%c' is invalid. The evolutionary strategy must be '+' or ','. The evolutionary strategy has been left unchanged as '%c'.\n", evolutionaryStrategy, params->evolutionaryStrategy);
+		fprintf(STDOUT_,"\nWarning: the evolutionary strategy '%c' is invalid. The evolutionary strategy must be '+' or ','. The evolutionary strategy has been left unchanged as '%c'.\n", evolutionaryStrategy, params->evolutionaryStrategy);
 	}
 }
 
@@ -650,7 +653,7 @@ DLL_EXPORT void setMutationRate(struct parameters *params, double mutationRate) 
 		params->mutationRate = mutationRate;
 	}
 	else {
-		printf("\nWarning: mutation rate '%f' is invalid. The mutation rate must be in the range [0,1]. The mutation rate has been left unchanged as '%f'.\n", mutationRate, params->mutationRate);
+		fprintf(STDOUT_,"\nWarning: mutation rate '%f' is invalid. The mutation rate must be in the range [0,1]. The mutation rate has been left unchanged as '%f'.\n", mutationRate, params->mutationRate);
 	}
 }
 
@@ -665,7 +668,7 @@ DLL_EXPORT void setRecurrentConnectionProbability(struct parameters *params, dou
 		params->recurrentConnectionProbability = recurrentConnectionProbability;
 	}
 	else {
-		printf("\nWarning: recurrent connection probability '%f' is invalid. The recurrent connection probability must be in the range [0,1]. The recurrent connection probability has been left unchanged as '%f'.\n", recurrentConnectionProbability, params->recurrentConnectionProbability);
+		fprintf(STDOUT_,"\nWarning: recurrent connection probability '%f' is invalid. The recurrent connection probability must be in the range [0,1]. The recurrent connection probability has been left unchanged as '%f'.\n", recurrentConnectionProbability, params->recurrentConnectionProbability);
 	}
 }
 
@@ -680,7 +683,7 @@ DLL_EXPORT void setShortcutConnections(struct parameters *params, int shortcutCo
 		params->shortcutConnections = shortcutConnections;
 	}
 	else {
-		printf("\nWarning: shortcut connection '%d' is invalid. The shortcut connections takes values 0 or 1. The shortcut connection has been left unchanged as '%d'.\n", shortcutConnections, params->shortcutConnections);
+		fprintf(STDOUT_,"\nWarning: shortcut connection '%d' is invalid. The shortcut connections takes values 0 or 1. The shortcut connection has been left unchanged as '%d'.\n", shortcutConnections, params->shortcutConnections);
 	}
 }
 
@@ -798,7 +801,7 @@ DLL_EXPORT void setMutationType(struct parameters *params, char const *mutationT
 	}
 
 	else {
-		printf("\nWarning: mutation type '%s' is invalid. The mutation type must be 'probabilistic' or 'point'. The mutation type has been left unchanged as '%s'.\n", mutationType, params->mutationTypeName);
+		fprintf(STDOUT_,"\nWarning: mutation type '%s' is invalid. The mutation type must be 'probabilistic' or 'point'. The mutation type has been left unchanged as '%s'.\n", mutationType, params->mutationTypeName);
 	}
 }
 
@@ -809,7 +812,7 @@ DLL_EXPORT void setMutationType(struct parameters *params, char const *mutationT
 DLL_EXPORT void setUpdateFrequency(struct parameters *params, int updateFrequency) {
 
 	if (updateFrequency < 0) {
-		printf("Warning: update frequency of %d is invalid. Update frequency must be >= 0. Update frequency is left unchanged as %d.\n", updateFrequency, params->updateFrequency);
+		fprintf(STDOUT_,"Warning: update frequency of %d is invalid. Update frequency must be >= 0. Update frequency is left unchanged as %d.\n", updateFrequency, params->updateFrequency);
 	}
 	else {
 		params->updateFrequency = updateFrequency;
@@ -826,7 +829,7 @@ DLL_EXPORT void setNumThreads(struct parameters *params, int numThreads) {
 
 	/* error checking */
 	if (numThreads <= 0) {
-		printf("Error: number threads cannot be less than one; %d is invalid. The number threads is left unchanged as %d.\n", numThreads, numThreads);
+		fprintf(STDOUT_,"Error: number threads cannot be less than one; %d is invalid. The number threads is left unchanged as %d.\n", numThreads, numThreads);
 	}
 
 	params->numThreads = numThreads;
@@ -848,7 +851,7 @@ DLL_EXPORT struct chromosome *initialiseChromosome(struct parameters *params) {
 
 	/* check that funcSet contains functions */
 	if (params->funcSet->numFunctions < 1) {
-		printf("Error: chromosome not initialised due to empty functionSet.\nTerminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: chromosome not initialised due to empty functionSet.\nTerminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -945,7 +948,7 @@ DLL_EXPORT struct chromosome* initialiseChromosomeFromFile(char const *file, dou
 
 	/* ensure that the file was opened correctly */
 	if (fp == NULL) {
-		printf("Warning: cannot open chromosome: '%s'. Chromosome was not open.\n", file);
+		fprintf(STDOUT_,"Warning: cannot open chromosome: '%s'. Chromosome was not open.\n", file);
 		return NULL;
 	}
 
@@ -994,8 +997,8 @@ DLL_EXPORT struct chromosome* initialiseChromosomeFromFile(char const *file, dou
 
 		/* can only load functions defined within CGP-Library */
 		if (addPresetFunctionToFunctionSet(params, funcName) == 0) {
-			printf("Error: cannot load chromosome which contains custom node functions.\n");
-			printf("Terminating CGP-Library.\n");
+			fprintf(STDOUT_,"Error: cannot load chromosome which contains custom node functions.\n");
+			fprintf(STDOUT_,"Terminating CGP-Library.\n");
 			freeParameters(params);
 			exit(0);
 		}
@@ -1062,7 +1065,7 @@ DLL_EXPORT struct chromosome* initialiseChromosomeFromFileWithUserFunctions(stru
 
 	/* ensure that the file was opened correctly */
 	if (fp == NULL) {
-		printf("Warning: cannot open chromosome: '%s'. Chromosome was not open.\n", file);
+		fprintf(STDOUT_,"Warning: cannot open chromosome: '%s'. Chromosome was not open.\n", file);
 		return NULL;
 	}
 
@@ -1146,7 +1149,7 @@ DLL_EXPORT struct chromosome *initialiseChromosomeFromChromosome(struct chromoso
 
 	/* check that funcSet contains functions*/
 	if (chromo == NULL) {
-		printf("Error: cannot initialise chromosome from uninitialised chromosome.\nTerminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot initialise chromosome from uninitialised chromosome.\nTerminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -1223,7 +1226,7 @@ DLL_EXPORT void freeChromosome(struct chromosome *chromo) {
 
 	/* attempt to prevent user double freeing */
 	if (chromo == NULL) {
-		printf("Warning: double freeing of chromosome prevented.\n");
+		fprintf(STDOUT_,"Warning: double freeing of chromosome prevented.\n");
 		return;
 	}
 
@@ -1271,7 +1274,7 @@ void loadConstants(struct chromosome *chromo, char* filename) {
 	for (int i = 0; i < chromo->numInputs; i++)
 	{
 		fscanf(f, "%lf ", &chromo->sigmaConstants[i]);
-		//printf("%i constants : %f\n", i, chromo->sigmaConstants[i]);
+		//fprintf(STDOUT_,"%i constants : %f\n", i, chromo->sigmaConstants[i]);
 	}
 	fclose(f);
 }
@@ -1295,7 +1298,7 @@ void runOnTest(struct chromosome *chromo, char* test_filename, char* error_filen
 		}
 	}
 
-	printf("ERROR ON TEST DATA: %lf", error);
+	fprintf(STDOUT_,"ERROR ON TEST DATA: %lf", error);
 
 	FILE* error_file = fopen(error_filename, "a");
 	fprintf(error_file, "%lf\n", error);
@@ -1363,54 +1366,54 @@ DLL_EXPORT void printChromosome(struct chromosome *chromo, int weights) {
 
 	/* error checking */
 	if (chromo == NULL) {
-		printf("Error: chromosome has not been initialised and cannot be printed.\n");
+		fprintf(STDOUT_,"Error: chromosome has not been initialised and cannot be printed.\n");
 		return;
 	}
 
 	/* set the active nodes in the given chromosome */
 	setChromosomeActiveNodes(chromo);
 
-	// printf("Const: %f %f %f\n", chromo->sigmaConstants[0], chromo->sigmaConstants[1], chromo->sigmaConstants[2]);
+	// fprintf(STDOUT_,"Const: %f %f %f\n", chromo->sigmaConstants[0], chromo->sigmaConstants[1], chromo->sigmaConstants[2]);
 	/* for all the chromo inputs*/
 	for (i = 0; i < chromo->numInputs; i++) {
-		printf("(%d):\tinput\n", i);
+		fprintf(STDOUT_,"(%d):\tinput\n", i);
 	}
 
 	/* for all the hidden nodes */
 	for (i = 0; i < chromo->numNodes; i++) {
 
 		/* print the node function */
-		printf("(%d):\t%s\t", chromo->numInputs + i, chromo->funcSet->functionNames[chromo->nodes[i]->function]);
+		fprintf(STDOUT_,"(%d):\t%s\t", chromo->numInputs + i, chromo->funcSet->functionNames[chromo->nodes[i]->function]);
 
 		/* for the arity of the node */
 		for (j = 0; j < getChromosomeNodeArity(chromo, i); j++) {
 
 			/* print the node input information */
 			if (weights == 1) {
-				printf("%d,%+.1f\t", chromo->nodes[i]->inputs[j], chromo->nodes[i]->weights[j]);
+				fprintf(STDOUT_,"%d,%+.1f\t", chromo->nodes[i]->inputs[j], chromo->nodes[i]->weights[j]);
 			}
 			else {
-				printf("%d ", chromo->nodes[i]->inputs[j]);
+				fprintf(STDOUT_,"%d ", chromo->nodes[i]->inputs[j]);
 			}
 		}
 
 		/* Highlight active nodes */
 		if (chromo->nodes[i]->active == 1) {
-			printf("*");
+			fprintf(STDOUT_,"*");
 		}
 
-		printf("\n");
+		fprintf(STDOUT_,"\n");
 	}
 
 	/* for all of the outputs */
-	printf("outputs: ");
+	fprintf(STDOUT_,"outputs: ");
 	for (i = 0; i < chromo->numOutputs; i++) {
 
 		/* print the output node locations */
-		printf("%d ", chromo->outputNodes[i]);
+		fprintf(STDOUT_,"%d ", chromo->outputNodes[i]);
 	}
 
-	printf("\n\n");
+	fprintf(STDOUT_,"\n\n");
 }
 
 
@@ -1440,7 +1443,7 @@ DLL_EXPORT void executeChromosome(struct chromosome *chromo, const double *input
 
 	/* error checking */
 	if (chromo == NULL) {
-		printf("Error: cannot execute uninitialised chromosome.\n Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot execute uninitialised chromosome.\n Terminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -1470,7 +1473,7 @@ DLL_EXPORT void executeChromosome(struct chromosome *chromo, const double *input
 					if (activeInputs[k] == nodeInputLocation)
 					{
 						simpleConstant = simpleConstants[k];
-						//printf("Debug: %f", simpleConstant);
+						//fprintf(STDOUT_,"Debug: %f", simpleConstant);
 					}*/
 
 			}
@@ -1530,7 +1533,7 @@ DLL_EXPORT void executeChromosome(struct chromosome *chromo, const double *input
 DLL_EXPORT double getChromosomeOutput(struct chromosome *chromo, int output) {
 
 	if (output < 0 || output > chromo->numOutputs) {
-		printf("Error: output less than or greater than the number of chromosome outputs. Called from getChromosomeOutput.\n");
+		fprintf(STDOUT_,"Error: output less than or greater than the number of chromosome outputs. Called from getChromosomeOutput.\n");
 		exit(0);
 	}
 
@@ -1545,7 +1548,7 @@ DLL_EXPORT double getChromosomeOutput(struct chromosome *chromo, int output) {
 */
 DLL_EXPORT double getChromosomeNodeValue(struct chromosome *chromo, int node) {
 	if (node < 0 || node > chromo->numNodes) {
-		printf("Error: node less than or greater than the number of nodes  in chromosome. Called from getChromosomeNodeValue.\n");
+		fprintf(STDOUT_,"Error: node less than or greater than the number of nodes  in chromosome. Called from getChromosomeNodeValue.\n");
 		exit(0);
 	}
 
@@ -1559,7 +1562,7 @@ DLL_EXPORT double getChromosomeNodeValue(struct chromosome *chromo, int node) {
 DLL_EXPORT int isNodeActive(struct chromosome *chromo, int node) {
 
 	if (node < 0 || node > chromo->numNodes) {
-		printf("Error: node less than or greater than the number of nodes  in chromosome. Called from isNodeActive.\n");
+		fprintf(STDOUT_,"Error: node less than or greater than the number of nodes  in chromosome. Called from isNodeActive.\n");
 		exit(0);
 	}
 
@@ -1580,7 +1583,7 @@ DLL_EXPORT void saveChromosome(struct chromosome *chromo, char const *fileName) 
 
 	/* ensure that the file was created correctly */
 	if (fp == NULL) {
-		printf("Warning: cannot save chromosome to '%s'. Chromosome was not saved.\n", fileName);
+		fprintf(STDOUT_,"Warning: cannot save chromosome to '%s'. Chromosome was not saved.\n", fileName);
 		return;
 	}
 
@@ -2369,26 +2372,26 @@ DLL_EXPORT void copyChromosome(struct chromosome *chromoDest, struct chromosome 
 
 	/* error checking  */
 	if (chromoDest->numInputs != chromoSrc->numInputs) {
-		printf("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome inputs do not match.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome inputs do not match.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
 	if (chromoDest->numNodes != chromoSrc->numNodes) {
-		printf("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome nodes do not match.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome nodes do not match.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
 	if (chromoDest->numOutputs != chromoSrc->numOutputs) {
-		printf("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome outputs do not match.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome outputs do not match.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
 	if (chromoDest->arity != chromoSrc->arity) {
-		printf("Error: cannot copy a chromosome to a chromosome of different dimensions. The arity of the chromosome nodes do not match.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot copy a chromosome to a chromosome of different dimensions. The arity of the chromosome nodes do not match.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -2512,7 +2515,7 @@ static void setChromosomeActiveNodes(struct chromosome *chromo) {
 
 	/* error checking */
 	if (chromo == NULL) {
-		printf("Error: chromosome has not been initialised and so the active nodes cannot be set.\n");
+		fprintf(STDOUT_,"Error: chromosome has not been initialised and so the active nodes cannot be set.\n");
 		return;
 	}
 
@@ -2660,7 +2663,7 @@ DLL_EXPORT struct dataSet *initialiseDataSetFromFile(char const *file) {
 
 	/* if the file cannot be found */
 	if (fp == NULL) {
-		printf("Error: file '%s' cannot be found.\nTerminating CGP-Library.\n", file);
+		fprintf(STDOUT_,"Error: file '%s' cannot be found.\nTerminating CGP-Library.\n", file);
 		exit(0);
 	}
 
@@ -2731,7 +2734,7 @@ DLL_EXPORT void freeDataSet(struct dataSet *data) {
 
 	/* attempt to prevent user double freeing */
 	if (data == NULL) {
-		printf("Warning: double freeing of dataSet prevented.\n");
+		fprintf(STDOUT_,"Warning: double freeing of dataSet prevented.\n");
 		return;
 	}
 
@@ -2753,24 +2756,24 @@ DLL_EXPORT void printDataSet(struct dataSet *data) {
 
 	int i, j;
 
-	printf("DATA SET\n");
-	printf("Inputs: %d, ", data->numInputs);
-	printf("Outputs: %d, ", data->numOutputs);
-	printf("Samples: %d\n", data->numSamples);
+	fprintf(STDOUT_,"DATA SET\n");
+	fprintf(STDOUT_,"Inputs: %d, ", data->numInputs);
+	fprintf(STDOUT_,"Outputs: %d, ", data->numOutputs);
+	fprintf(STDOUT_,"Samples: %d\n", data->numSamples);
 
 	for (i = 0; i < data->numSamples; i++) {
 
 		for (j = 0; j < data->numInputs; j++) {
-			printf("%f ", data->inputData[i][j]);
+			fprintf(STDOUT_,"%f ", data->inputData[i][j]);
 		}
 
-		printf(" : ");
+		fprintf(STDOUT_," : ");
 
 		for (j = 0; j < data->numOutputs; j++) {
-			printf("%f ", data->outputData[i][j]);
+			fprintf(STDOUT_,"%f ", data->outputData[i][j]);
 		}
 
-		printf("\n");
+		fprintf(STDOUT_,"\n");
 	}
 }
 
@@ -2786,7 +2789,7 @@ DLL_EXPORT void saveDataSet(struct dataSet *data, char const *fileName) {
 	fp = fopen(fileName, "w");
 
 	if (fp == NULL) {
-		printf("Warning: cannot save data set to %s. Data set was not saved.\n", fileName);
+		fprintf(STDOUT_,"Warning: cannot save data set to %s. Data set was not saved.\n", fileName);
 		return;
 	}
 
@@ -2919,7 +2922,7 @@ DLL_EXPORT void freeResults(struct results *rels) {
 
 	/* attempt to prevent user double freeing */
 	if (rels == NULL) {
-		printf("Warning: double freeing of results prevented.\n");
+		fprintf(STDOUT_,"Warning: double freeing of results prevented.\n");
 		return;
 	}
 
@@ -2943,14 +2946,14 @@ DLL_EXPORT void saveResults(struct results *rels, char const *fileName) {
 	struct chromosome *chromoTemp;
 
 	if (rels == NULL) {
-		printf("Warning: cannot save uninitialised results structure. Results not saved.\n");
+		fprintf(STDOUT_,"Warning: cannot save uninitialised results structure. Results not saved.\n");
 		return;
 	}
 
 	fp = fopen(fileName, "w");
 
 	if (fp == NULL) {
-		printf("Warning: cannot open '%s' and so cannot save results to that file. Results not saved.\n", fileName);
+		fprintf(STDOUT_,"Warning: cannot open '%s' and so cannot save results to that file. Results not saved.\n", fileName);
 		return;
 	}
 
@@ -3185,7 +3188,7 @@ DLL_EXPORT struct chromosome* getChromosome(struct results *rels, int run) {
 
 	/* do some error checking */
 	if (rels == NULL) {
-		printf("Error: cannot get best chromosome from uninitialised results.\nTerminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot get best chromosome from uninitialised results.\nTerminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -3457,7 +3460,7 @@ static void probabilisticMutation(struct parameters *params, struct chromosome *
 	for (k = 0; k < params->numInputs; k++) {
 		chromo->simpleConstants[k] = chromo->simpleConstants[k] + params->maxMutationConst * double_rand(-1, 1);
 		chromo->sigmaConstants[k] = params->shiftForSigmoid[k] + params->scaleForSigmoid[k] * sigmoidForMutation(chromo->simpleConstants[k]);
-		//printf("%i", k);
+		//fprintf(STDOUT_,"%i", k);
 	}
 
 	/* for every nodes in the chromosome */
@@ -3514,7 +3517,7 @@ static void probabilisticMutation(struct parameters *params, struct chromosome *
 static void probabilisticMutationOnlyActive(struct parameters *params, struct chromosome *chromo) {
 
 
-	printf("!!!!!!!!!!!!");
+	fprintf(STDOUT_,"!!!!!!!!!!!!");
 	int i, j;
 	int activeNode;
 
@@ -3531,14 +3534,14 @@ static void probabilisticMutationOnlyActive(struct parameters *params, struct ch
 		/* for every input to each chromosome */
 		for (j = 0; j < params->arity; j++) {
 			if (chromo->nodes[i]->inputs[j] > 1)
-				printf("OKK!");
+				fprintf(STDOUT_,"OKK!");
 
 			if (chromo->nodes[i]->function > 3)
 			{
 				if (randDecimal() < params->mutationRate)
 					chromo->nodes[i]->inputs[j] = rand() % params->numInputs;
 
-				//printf("_________%i____%i_____\n", chromo->nodes[i]->inputs[j], params->numInputs);
+				//fprintf(STDOUT_,"_________%i____%i_____\n", chromo->nodes[i]->inputs[j], params->numInputs);
 
 				continue;
 			}
@@ -3588,7 +3591,7 @@ DLL_EXPORT struct results* repeatCGP(struct parameters *params, struct dataSet *
 
 	rels = initialiseResults(params, numRuns);
 
-	printf("Run\tFitness\t\tGenerations\tActive Nodes\n");
+	fprintf(STDOUT_,"Run\tFitness\t\tGenerations\tActive Nodes\n");
 
 	/* for each run */
 #pragma omp parallel for default(none), shared(numRuns,rels,params,data,numGens), schedule(dynamic), num_threads(params->numThreads)
@@ -3597,13 +3600,13 @@ DLL_EXPORT struct results* repeatCGP(struct parameters *params, struct dataSet *
 		/* run cgp */
 		rels->bestChromosomes[i] = runCGP(params, data, numGens);
 
-		printf("%d\t%f\t%d\t\t%d\n", i, rels->bestChromosomes[i]->fitness, rels->bestChromosomes[i]->generation, rels->bestChromosomes[i]->numActiveNodes);
+		fprintf(STDOUT_,"%d\t%f\t%d\t\t%d\n", i, rels->bestChromosomes[i]->fitness, rels->bestChromosomes[i]->generation, rels->bestChromosomes[i]->numActiveNodes);
 	}
 
-	printf("----------------------------------------------------\n");
-	printf("MEAN\t%f\t%f\t%f\n", getAverageFitness(rels), getAverageGenerations(rels), getAverageActiveNodes(rels));
-	printf("MEDIAN\t%f\t%f\t%f\n", getMedianFitness(rels), getMedianGenerations(rels), getMedianActiveNodes(rels));
-	printf("----------------------------------------------------\n\n");
+	fprintf(STDOUT_,"----------------------------------------------------\n");
+	fprintf(STDOUT_,"MEAN\t%f\t%f\t%f\n", getAverageFitness(rels), getAverageGenerations(rels), getAverageActiveNodes(rels));
+	fprintf(STDOUT_,"MEDIAN\t%f\t%f\t%f\n", getMedianFitness(rels), getMedianGenerations(rels), getMedianActiveNodes(rels));
+	fprintf(STDOUT_,"----------------------------------------------------\n\n");
 
 	/* restore the original value for the update frequency */
 	params->updateFrequency = updateFrequency;
@@ -3630,19 +3633,19 @@ DLL_EXPORT struct chromosome* runCGP(struct parameters *params, struct dataSet *
 
 	/* error checking */
 	if (numGens < 0) {
-		printf("Error: %d generations is invalid. The number of generations must be >= 0.\n Terminating CGP-Library.\n", numGens);
+		fprintf(STDOUT_,"Error: %d generations is invalid. The number of generations must be >= 0.\n Terminating CGP-Library.\n", numGens);
 		exit(0);
 	}
 
 	if (data != NULL && params->numInputs != data->numInputs) {
-		printf("Error: The number of inputs specified in the dataSet (%d) does not match the number of inputs specified in the parameters (%d).\n", data->numInputs, params->numInputs);
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: The number of inputs specified in the dataSet (%d) does not match the number of inputs specified in the parameters (%d).\n", data->numInputs, params->numInputs);
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
 	if (data != NULL && params->numOutputs != data->numOutputs) {
-		printf("Error: The number of outputs specified in the dataSet (%d) does not match the number of outputs specified in the parameters (%d).\n", data->numOutputs, params->numOutputs);
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: The number of outputs specified in the dataSet (%d) does not match the number of outputs specified in the parameters (%d).\n", data->numOutputs, params->numOutputs);
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -3671,7 +3674,7 @@ DLL_EXPORT struct chromosome* runCGP(struct parameters *params, struct dataSet *
 		numCandidateChromos = params->lambda;
 	}
 	else {
-		printf("Error: the evolutionary strategy '%c' is not known.\nTerminating CGP-Library.\n", params->evolutionaryStrategy);
+		fprintf(STDOUT_,"Error: the evolutionary strategy '%c' is not known.\nTerminating CGP-Library.\n", params->evolutionaryStrategy);
 		exit(0);
 	}
 
@@ -3690,8 +3693,8 @@ DLL_EXPORT struct chromosome* runCGP(struct parameters *params, struct dataSet *
 	/* show the user whats going on */
 	/*
 	if (params->updateFrequency != 0) {
-		printf("\n-- Starting CGP --\n\n");
-		printf("Gen\tfitness\n");
+		fprintf(STDOUT_,"\n-- Starting CGP --\n\n");
+		fprintf(STDOUT_,"Gen\tfitness\n");
 	}
 	*/
 
@@ -3711,7 +3714,7 @@ DLL_EXPORT struct chromosome* runCGP(struct parameters *params, struct dataSet *
 		if (getChromosomeFitness(bestChromo) <= params->targetFitness) {
 
 			if (params->updateFrequency != 0) {
-				printf("%d\t%f - Solution Found\n", gen, bestChromo->fitness);
+				fprintf(STDOUT_,"%d\t%f - Solution Found\n", gen, bestChromo->fitness);
 			}
 
 			break;
@@ -3719,12 +3722,12 @@ DLL_EXPORT struct chromosome* runCGP(struct parameters *params, struct dataSet *
 
 		/* display progress to the user at the update frequency specified */
 		if (params->updateFrequency != 0 && (gen % params->updateFrequency == 0 || gen >= numGens - 1)) {
-			printf("runCGP: %d\tfitness: %f\t", gen, bestChromo->fitness);
+			fprintf(STDOUT_,"runCGP: %d\tfitness: %f\t", gen, bestChromo->fitness);
 			/*
 			for (int l = 0; l < bestChromo->numInputs; l++)
-				printf("%i: %f \t", l, bestChromo->sigmaConstants[l]);
+				fprintf(STDOUT_,"%i: %f \t", l, bestChromo->sigmaConstants[l]);
 			*/
-			printf("\n");
+			fprintf(STDOUT_,"\n");
 		}
 
 		/*
@@ -3766,7 +3769,7 @@ DLL_EXPORT struct chromosome* runCGP(struct parameters *params, struct dataSet *
 
 	/* deal with formatting for displaying progress */
 	if (params->updateFrequency != 0) {
-		printf("\n");
+		fprintf(STDOUT_,"\n");
 	}
 
 	/* copy the best best chromosome */
@@ -3813,19 +3816,19 @@ DLL_EXPORT struct chromosome* rerunCGP(struct parameters *params, struct dataSet
 
 	/* error checking */
 	if (numGens < 0) {
-		printf("Error: %d generations is invalid. The number of generations must be >= 0.\n Terminating CGP-Library.\n", numGens);
+		fprintf(STDOUT_,"Error: %d generations is invalid. The number of generations must be >= 0.\n Terminating CGP-Library.\n", numGens);
 		exit(0);
 	}
 
 	if (data != NULL && params->numInputs != data->numInputs) {
-		printf("Error: The number of inputs specified in the dataSet (%d) does not match the number of inputs specified in the parameters (%d).\n", data->numInputs, params->numInputs);
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: The number of inputs specified in the dataSet (%d) does not match the number of inputs specified in the parameters (%d).\n", data->numInputs, params->numInputs);
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
 	if (data != NULL && params->numOutputs != data->numOutputs) {
-		printf("Error: The number of outputs specified in the dataSet (%d) does not match the number of outputs specified in the parameters (%d).\n", data->numOutputs, params->numOutputs);
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: The number of outputs specified in the dataSet (%d) does not match the number of outputs specified in the parameters (%d).\n", data->numOutputs, params->numOutputs);
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -3858,7 +3861,7 @@ DLL_EXPORT struct chromosome* rerunCGP(struct parameters *params, struct dataSet
 		numCandidateChromos = params->lambda;
 	}
 	else {
-		printf("Error: the evolutionary strategy '%c' is not known.\nTerminating CGP-Library.\n", params->evolutionaryStrategy);
+		fprintf(STDOUT_,"Error: the evolutionary strategy '%c' is not known.\nTerminating CGP-Library.\n", params->evolutionaryStrategy);
 		exit(0);
 	}
 
@@ -3877,8 +3880,8 @@ DLL_EXPORT struct chromosome* rerunCGP(struct parameters *params, struct dataSet
 	/* show the user whats going on */
 	/*
 	if (params->updateFrequency != 0) {
-		printf("\n-- Starting CGP --\n\n");
-		printf("Gen\tfitness\n");
+		fprintf(STDOUT_,"\n-- Starting CGP --\n\n");
+		fprintf(STDOUT_,"Gen\tfitness\n");
 	}
 	*/
 
@@ -3898,7 +3901,7 @@ DLL_EXPORT struct chromosome* rerunCGP(struct parameters *params, struct dataSet
 		if (getChromosomeFitness(bestChromo) <= params->targetFitness) {
 
 			if (params->updateFrequency != 0) {
-				printf("%d\t%f - Solution Found\n", gen, bestChromo->fitness);
+				fprintf(STDOUT_,"%d\t%f - Solution Found\n", gen, bestChromo->fitness);
 			}
 
 			break;
@@ -3906,12 +3909,12 @@ DLL_EXPORT struct chromosome* rerunCGP(struct parameters *params, struct dataSet
 
 		/* display progress to the user at the update frequency specified */
 		if (params->updateFrequency != 0 && (gen % params->updateFrequency == 0 || gen >= numGens - 1)) {
-			printf("rerunCGP: %d\tfitness: %f\t", gen, bestChromo->fitness);
+			fprintf(STDOUT_,"rerunCGP: %d\tfitness: %f\t", gen, bestChromo->fitness);
 			/*
 			for (int l = 0; l < bestChromo->numInputs; l++)
-				printf("%i: %f \t", l, bestChromo->sigmaConstants[l]);
+				fprintf(STDOUT_,"%i: %f \t", l, bestChromo->sigmaConstants[l]);
 			*/
-			printf("\n");
+			fprintf(STDOUT_,"\n");
 		}
 
 		/*
@@ -3953,7 +3956,7 @@ DLL_EXPORT struct chromosome* rerunCGP(struct parameters *params, struct dataSet
 
 	/* deal with formatting for displaying progress */
 	if (params->updateFrequency != 0) {
-		printf("\n");
+		fprintf(STDOUT_,"\n");
 	}
 
 	/* copy the best best chromosome */
@@ -4128,10 +4131,10 @@ static struct node *initialiseNode(int numInputs, int numNodes, int arity, int n
 		n->inputs[i] = getRandomNodeInput(numInputs, numNodes, nodePosition, recurrentConnectionProbability);
 		n->weights[i] = getRandomConnectionWeight(connectionWeightRange);
 
-		//printf("%i\n", n->function);
+		//fprintf(STDOUT_,"%i\n", n->function);
 		//if (n->function > 3) {
 		//	n->inputs[i] = rand() % numInputs;
-		//	printf("%i", n->inputs[i]);
+		//	fprintf(STDOUT_,"%i", n->inputs[i]);
 		//}
 	}
 
@@ -4152,7 +4155,7 @@ static void freeNode(struct node *n) {
 
 	/* attempt to prevent user double freeing */
 	if (n == NULL) {
-		printf("Warning: double freeing of node prevented.\n");
+		fprintf(STDOUT_,"Warning: double freeing of node prevented.\n");
 		return;
 	}
 
@@ -4175,7 +4178,7 @@ static int getRandomFunction(int numFunctions) {
 
 	/* check that funcSet contains functions */
 	if (numFunctions < 1) {
-		printf("Error: cannot assign the function gene a value as the Function Set is empty.\nTerminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: cannot assign the function gene a value as the Function Set is empty.\nTerminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -4689,14 +4692,14 @@ static double supervisedLearning(struct parameters *params, struct chromosome *c
 
 	/* error checking */
 	if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data)) {
-		printf("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
 	if (getNumChromosomeOutputs(chromo) != getNumDataSetOutputs(data)) {
-		printf("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -4736,14 +4739,14 @@ double supervisedLearningUserData(struct parameters *params, struct chromosome *
 
 	/* error checking */
 	if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data)) {
-		printf("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
 	if (getNumChromosomeOutputs(chromo) != getNumDataSetOutputs(data)) {
-		printf("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
-		printf("Terminating CGP-Library.\n");
+		fprintf(STDOUT_,"Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
+		fprintf(STDOUT_,"Terminating CGP-Library.\n");
 		exit(0);
 	}
 
@@ -4821,13 +4824,13 @@ static void printFunctionSet(struct parameters *params) {
 
 	int i;
 
-	printf("Function Set:");
+	fprintf(STDOUT_,"Function Set:");
 
 	for (i = 0; i < params->funcSet->numFunctions; i++) {
-		printf(" %s", params->funcSet->functionNames[i]);
+		fprintf(STDOUT_," %s", params->funcSet->functionNames[i]);
 	}
 
-	printf(" (%d)\n", params->funcSet->numFunctions);
+	fprintf(STDOUT_," (%d)\n", params->funcSet->numFunctions);
 }
 
 

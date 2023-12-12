@@ -5,6 +5,9 @@
 #include <time.h>
 #include "cgp.h"
 
+
+FILE* STDOUT_ = NULL;
+
 double maximum(double num[], int size)
 {
 	int i;
@@ -98,6 +101,21 @@ void shuffle(int **train_index, int**test_index, int n, double alpha)
 
 }
 
+char *getFileName(char *path) {
+	char *retVal = path;
+	char* p;
+	for (p = path; *p; p++) {
+		if (*p == '/' || *p == '\\' || *p == ':') {
+			retVal = p;
+		}
+	}
+
+	retVal = retVal + 1;
+	fprintf(STDOUT_, "files start with: %s\n", retVal);
+	return retVal;
+}
+
+
 
 void OperOPTB1(
 
@@ -131,8 +149,8 @@ struct dataSet *trainingData_right,
 	struct chromosome *chromo_right = NULL;
 
 	
-	train_filename_left = parametersFileName; /* unique names for output chromo, constants etc. */
-	train_filename_right = parametersFileName; /* unique names for output chromo, constants etc.  */
+	train_filename_left = getFileName(parametersFileName); /* unique names for output chromo, constants etc. */
+	train_filename_right = getFileName(parametersFileName); /* unique names for output chromo, constants etc.  */
 
 
 
@@ -204,15 +222,15 @@ struct dataSet *trainingData_right,
 
 		int numIter = numGens / numGensInt;
 		for (int k = 0; k < numIter; k++) {
-			fprintf(stdout, "numLevel: %d of %d; ", i, numLevels);
-			fprintf(stdout, "iter: %d of %d; left ", k, numIter);
+			fprintf(STDOUT_, "numLevel: %d of %d; ", i, numLevels);
+			fprintf(STDOUT_, "iter: %d of %d; left ", k, numIter);
 			chromo_left = rerunCGP(paramsLeft, trainingData_left, numGensInt, chromo_left);
 			getResult(trainingData_left, errors_chromo_left, chromo_left, 1);
 			for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
 				errors_chromo[j] = errors_chromo_left[j];
 			}
-			fprintf(stdout, "numLevel: %d of %d; ", i, numLevels);
-			fprintf(stdout, "iter: %d of %d; right ", k, numIter);
+			fprintf(STDOUT_, "numLevel: %d of %d; ", i, numLevels);
+			fprintf(STDOUT_, "iter: %d of %d; right ", k, numIter);
 			chromo_right = rerunCGP(paramsRight, trainingData_right, numGensInt, chromo_right);
 			getResult(trainingData_right, errors_chromo_right, chromo_right, 1);
 			for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
@@ -272,8 +290,8 @@ void OperOPTB3(
 	struct parameters *paramsRight = NULL;
 	struct chromosome *chromo = NULL;
 
-	char* train_filename_left_for_name = parametersFileName; /* the name to construct names*/
-	char* train_filename_right_for_name = parametersFileName;
+	char* train_filename_left_for_name = getFileName(parametersFileName); /* the name to construct names*/
+	char* train_filename_right_for_name = getFileName(parametersFileName);
 
 	//char* train_filename_left =
 	//char* train_filename_right = 
@@ -383,7 +401,7 @@ void OperOPTB3(
 	double sum = 0;
 	for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
 		sum += errors_chromo[j];
-		//fprintf(stdout, "%4d, %13.6lf, %13.6lf\n", j, errors_chromo[j], getDataSetSampleOutput(trainingData_right, j, 0));
+		//fprintf(STDOUT_, "%4d, %13.6lf, %13.6lf\n", j, errors_chromo[j], getDataSetSampleOutput(trainingData_right, j, 0));
 	}
 	printf(":%lf", sum / getDataSetNumSamples(trainingData_right));
 	freeParameters(paramsLeft);
@@ -403,13 +421,39 @@ void OperOPTB3(
 char usage_string[256] ="Usage: cgpapp --default-name=param_file\n";
 int main(int argc, char** argv) {
 
-	int operation_mode = OPERATION_ABCDE; /* 0 - optimization
+
+	//STDOUT_ = stdout;
+	STDOUT_ = NULL;
+	int operation_mode = 0;
+	 /* 0 - optimization
 							   1 - print errors */
 
 
 	char* parametersFileName = NULL;
-	if (argc > 1) {
+
+
+	if (argc == 2) {
 		parametersFileName = argv[1] + strlen("--default-name=");
+
+		printf("parameters file: %s\n", parametersFileName);
+
+		operation_mode = OPERATION_ABCDE;
+		STDOUT_ = stdout;
+
+	}
+
+	else if (argc == 3) { /*ABCDE MODE*/
+		parametersFileName = argv[1] + strlen("--default-name=");
+		// argv[2] == -d
+		operation_mode = OPERATION_ABCDE;
+		STDOUT_ = fopen("NUL", "w"); //for windows
+
+	}
+	else if(argc > 1){
+		sscanf(argv[1], "%d", &operation_mode);
+		printf("USER MODE\n");
+		STDOUT_ = stdout;
+
 	}
 	else {
 		fprintf(stderr, "No parameters given, exiting\n");
@@ -429,6 +473,7 @@ int main(int argc, char** argv) {
 	int nodeArity = 2;
 	int numGens = 80000;
 	int numGensInt = 800;
+
 	double targetFitness = 0.01;
 	int updateFrequency = 500;
 	double maxMutationConst = 0.1;
@@ -448,25 +493,33 @@ int main(int argc, char** argv) {
 
 
 
-	fseek(pFile, 0, SEEK_END);
-	long size = ftell(pFile);
-	fseek(pFile, 0, SEEK_SET);
-	char* fcontent = malloc(size*sizeof(char));
-	fread(fcontent, 1, size, pFile);
-	char* istr = strstr(fcontent, "[CGP]");
-	int position = istr - fcontent + strlen("[CGP]\n");
+	//fseek(pFile, 0, SEEK_END);
+	//long size = ftell(pFile);
+	//fseek(pFile, 0, SEEK_SET);
+	//char* fcontent = malloc(size*sizeof(char));
+	//fread(fcontent, 1, size, pFile);
+	//char* istr = strstr(fcontent, "[CGP]");
+	//int position = istr - fcontent + strlen("[CGP]\n");
 
-	free(fcontent);
-
+	//free(fcontent);
+	
 	
 
-	fseek(pFile, position, SEEK_SET);
+	//fseek(pFile, position, SEEK_SET);
+	char s[500] = { 0 };
+	while (strcmp(s, "[CGP]") != 0)
+	{
+		fscanf(pFile,"%s", s);
 
+	}
 
-
+	fscanf(pFile, "\n");
 	fscanf(pFile, "numInputsLeft=%i;\n", &numInputsLeft);
 	fscanf(pFile, "numInputsRight=%i;\n", &numInputsRight);
-	fscanf(pFile, "numNodes=%i;\n", &numNodes);
+
+
+
+	fscanf(pFile, "numNodes=%i;\r\n", &numNodes);
 	fscanf(pFile, "numOutputs=%i;\n", &numOutputs);
 	fscanf(pFile, "nodeArity=%i;\n", &nodeArity);
 	fscanf(pFile, "numGens=%i;\n", &numGens);
@@ -477,18 +530,18 @@ int main(int argc, char** argv) {
 	fscanf(pFile, "levelCoeff=%lf;\n", &levelCoeff);
 	fscanf(pFile, "numGensInt=%i;\n", &numGensInt);
 
-	char* fulldata_left =(char*) malloc(50*sizeof(char));
-	char* fulldata_right = (char*)malloc(50 * sizeof(char));
+	char* fulldata_left =(char*) malloc(100*sizeof(char));
+	char* fulldata_right = (char*)malloc(100 * sizeof(char));
 	fscanf(pFile, "%s\n", fulldata_left);
 	fscanf(pFile, "%s\n", fulldata_right);
 	fulldata_left =  fulldata_right+strlen("fulldata_right=");
 	fulldata_right = fulldata_left + strlen("fulldata_left=");
 
-	printf("%s", fulldata_left);
+	fprintf(STDOUT_,"%s", fulldata_left);
 
 	double* defaultSimpleConstantsLeft = malloc(numInputsLeft * sizeof(double));
 
-	fscanf(pFile, "\n", NULL);
+	//fscanf(pFile, "\n", NULL);
 
 
 	for (int i = 0; i < numInputsLeft; ++i) {
@@ -497,57 +550,57 @@ int main(int argc, char** argv) {
 		int y;
 		fscanf(pFile, "defaultSimpleConstantsLeft%i=%lf;\n", &y, &defaultSimpleConstantsLeft[i]);
 
-		//printf(" defaultSimpleConstantsLeft %i = %lf \n", i, defaultSimpleConstantsLeft[i]);
+		//fprintf(STDOUT_," defaultSimpleConstantsLeft %i = %lf \n", i, defaultSimpleConstantsLeft[i]);
 	}
 
 
 
-	fscanf(pFile, "\n", NULL);
-	// printf("\n");
+	//fscanf(pFile, "\n", NULL);
+	// fprintf(STDOUT_,"\n");
 	double* shiftForSigmoidLeft = malloc(numInputsLeft * sizeof(double));
 	for (int i = 0; i < numInputsLeft; ++i) {
 		int y;
 		fscanf(pFile, "shiftForSigmoidLeft%i=%lf;\n", &y, &shiftForSigmoidLeft[i]);
-		//printf(" shiftForSigmoidLeft%i = %lf\n ", i, shiftForSigmoidLeft[i]);
+		//fprintf(STDOUT_," shiftForSigmoidLeft%i = %lf\n ", i, shiftForSigmoidLeft[i]);
 	}
 
-	fscanf(pFile, "\n", NULL);
+	//fscanf(pFile, "\n", NULL);
 
 
-	// printf("\n");
+	// fprintf(STDOUT_,"\n");
 	double* scaleForSigmoidLeft = malloc(numInputsLeft * sizeof(double));
 	for (int i = 0; i < numInputsLeft; ++i) {
 		int y;
 		fscanf(pFile, "scaleForSigmoidLeft%i=%lf;\n", &y, &scaleForSigmoidLeft[i]);
-		//printf("scaleForSigmoidLeft%i = %lf \n", i, scaleForSigmoidLeft[i]);
+		//fprintf(STDOUT_,"scaleForSigmoidLeft%i = %lf \n", i, scaleForSigmoidLeft[i]);
 	}
 
 
-	fscanf(pFile, "\n", NULL);
+	//fscanf(pFile, "\n", NULL);
 	double* defaultSimpleConstantsRight = malloc(numInputsRight * sizeof(double));
 
 	for (int i = 0; i < numInputsRight; ++i) {
 		int y;
 		fscanf(pFile, "defaultSimpleConstantsRight%i=%lf;\n", &y, &defaultSimpleConstantsRight[i]);
-		//printf("defaultSimpleConstantsRight%i = %lf \n", i, defaultSimpleConstantsRight[i]);
+		//fprintf(STDOUT_,"defaultSimpleConstantsRight%i = %lf \n", i, defaultSimpleConstantsRight[i]);
 	}
 
-	fscanf(pFile, "\n", NULL);
-	// printf("\n");
+	//fscanf(pFile, "\n", NULL);
+	// fprintf(STDOUT_,"\n");
 	double* shiftForSigmoidRight = malloc(numInputsRight * sizeof(double));
 	for (int i = 0; i < numInputsRight; ++i) {
 		int y;
 		fscanf(pFile, "shiftForSigmoidRight%i=%lf;\n", &y, &shiftForSigmoidRight[i]);
-		//printf("shiftForSigmoidRight%i=%lf \n", i, shiftForSigmoidRight[i]);
+		//fprintf(STDOUT_,"shiftForSigmoidRight%i=%lf \n", i, shiftForSigmoidRight[i]);
 	}
 
-	fscanf(pFile, "\n", NULL);
-	// printf("\n");
+	//fscanf(pFile, "\n", NULL);
+	// fprintf(STDOUT_,"\n");
 	double* scaleForSigmoidRight = malloc(numInputsRight * sizeof(double));
 	for (int i = 0; i < numInputsRight; ++i) {
 		int y;
 		fscanf(pFile, "scaleForSigmoidRight%i=%lf;\n", &y, &scaleForSigmoidRight[i]);
-		//printf("scaleForSigmoidRight%i=%lf \n", i, scaleForSigmoidRight[i]);
+		//fprintf(STDOUT_,"scaleForSigmoidRight%i=%lf \n", i, scaleForSigmoidRight[i]);
 	}
 	fclose(pFile);
 
@@ -709,15 +762,15 @@ int main(int argc, char** argv) {
 
 			int numIter = numGens / numGensInt;
 			for (int k = 0; k < numIter; k++) {
-				fprintf(stdout, "numLevel: %d of %d; ", i, numLevels);
-				fprintf(stdout, "iter: %d of %d; left ", k, numIter);
+				fprintf(STDOUT_, "numLevel: %d of %d; ", i, numLevels);
+				fprintf(STDOUT_, "iter: %d of %d; left ", k, numIter);
 				chromo_left = rerunCGP(paramsLeft, trainingData_left, numGensInt, chromo_left);
 				getResult(trainingData_left, errors_chromo_left, chromo_left, 1);
 				for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
 					errors_chromo[j] = errors_chromo_left[j];
 				}
-				fprintf(stdout, "numLevel: %d of %d; ", i, numLevels);
-				fprintf(stdout, "iter: %d of %d; right ", k, numIter);
+				fprintf(STDOUT_, "numLevel: %d of %d; ", i, numLevels);
+				fprintf(STDOUT_, "iter: %d of %d; right ", k, numIter);
 				chromo_right = rerunCGP(paramsRight, trainingData_right, numGensInt, chromo_right);
 				getResult(trainingData_right, errors_chromo_right, chromo_right, 1);
 				for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
@@ -867,7 +920,7 @@ int main(int argc, char** argv) {
 		}
 
 		for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
-			fprintf(stdout, "%4d, %13.6lf, %13.6lf\n", j, errors_chromo[j], getDataSetSampleOutput(trainingData_right, j, 0));
+			fprintf(STDOUT_, "%4d, %13.6lf, %13.6lf\n", j, errors_chromo[j], getDataSetSampleOutput(trainingData_right, j, 0));
 		}
 
 		freeParameters(paramsLeft);
@@ -926,11 +979,11 @@ int main(int argc, char** argv) {
 		for (int i = 0; i < getDataSetNumSamples(data); i++)
 			sum_errors += errors[i];
 
-		printf("%lf\n", sum_errors);
+		fprintf(STDOUT_,"%lf\n", sum_errors);
 
-		printf("%lf\n", 1 - SS_res_ / SS_tot_);
+		fprintf(STDOUT_,"%lf\n", 1 - SS_res_ / SS_tot_);
 
-		printf("%lf\n", maximum(errors, getDataSetNumSamples(data)));
+		fprintf(STDOUT_,"%lf\n", maximum(errors, getDataSetNumSamples(data)));
 
 		freeDataSet(data);
 	}
@@ -987,7 +1040,7 @@ int main(int argc, char** argv) {
 		ik= 0;
 		for (int tmp = 0; tmp < train_N; tmp++)
 		{
-			printf("\n");
+			fprintf(STDOUT_,"\n");
 	
 			inputs_train_left[ik] = getDataSetSampleInputs(Data_left, train_index[tmp]);
 			outputs_train_left[ik] = getDataSetSampleOutputs(Data_left, train_index[tmp]);
