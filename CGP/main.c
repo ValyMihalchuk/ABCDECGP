@@ -8,6 +8,21 @@
 
 FILE* STDOUT_ = NULL;
 
+
+size_t join_integers(const unsigned int *num, size_t num_len, char *buf, size_t buf_len) {
+	size_t i;
+	unsigned int written = 0;
+
+	for (i = 0; i < num_len; i++) {
+		written += snprintf(buf + written, buf_len - written, (i != 0 ? ", %u" : "%u"),
+			*(num + i));
+		if (written == buf_len)
+			break;
+	}
+
+	return written;
+}
+
 double maximum(double num[], int size)
 {
 	int i;
@@ -1022,10 +1037,29 @@ int main(int argc, char** argv) {
 		int* train_index = NULL;
 		shuffle(&train_index, &test_index, N, alpha);
 
+	
+
 		int train_N = N * alpha;
 		int test_N = N - train_N;
 
 
+
+		
+		FILE *index_file;
+		index_file = fopen("index_file.txt", "a");
+
+
+		for(int x=0; x < test_N; x++)
+			fprintf(index_file, "%i, ", test_index[x]);
+		fprintf(index_file, "\n");
+
+		for (int x = 0; x < test_N; x++)
+			fprintf(index_file, "%i, ", train_index[x]);
+		fprintf(index_file, "\n");
+
+
+
+		fclose(index_file);
 
 		struct dataSet *data_train_left = NULL;
 		struct dataSet *data_test_left = NULL;
