@@ -25,18 +25,8 @@ Simulation_Model_for_Time_to_Flowering_with_Climatic_and_Genetic_Inputs_for.pdf
 Kahraman, Abdulkadir Aydogan, Douglas Cook, Sergey Nuzhdin, and Maria Samsonova.
 “Non-Linear Regression Models for Time to Flowering in Wild Chickpea Combine
 Genetic and Climatic Factors.” BMC Plant Biology 19, no. S2 (2019): 94.
-
-https://doi.org/10.1186/s12870-019-1685-2.[Kozlov_et_al-2019-Non-
-linear_regression_models_for_time_to_flowering_in_wild_chickpea_combine.pdf](uploa
-
-ds/ff1626a8a4698ae73fabadc2a0a4376a/Kozlov_et_al-2019-Non-
-linear_regression_models_for_time_to_flowering_in_wild_chickpea_combine.pdf)
-
 3. Miller, Julian Francis. “Cartesian Genetic Programming: Its Status and Future.” Genetic
 Programming and Evolvable Machines 21, no. 1–2 (June 2020): 129–68.
-
-https://doi.org/10.1007/s10710-019-09360-6. Miller-
-2020Cartesian_genetic_programming.pdf
 4. Михальчук В. А. Разработка модели учета генетических и географических факторов
 для прогнозирования фенотипических признаков растений с помощью декартова
 генетического программирования: выпускная квалификационная работа бакалавра.
