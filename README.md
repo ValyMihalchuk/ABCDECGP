@@ -15,8 +15,7 @@
 
 1. Ageev, Andrey, Abdulkadir Aydogan, Eric Bishop-von Wettberg, Sergey V. Nuzhdin,
 Maria Samsonova, and Konstantin Kozlov. “Simulation Model for Time to Flowering
-with Climatic and Genetic Inputs for Wild Chickpea.” Agronomy 11, no. 7 (July 9, 2021):
-1389.
+with Climatic and Genetic Inputs for Wild Chickpea.” Agronomy 11, no. 7 (July 9, 2021)
 2. Kozlov, Konstantin, Anupam Singh, Jens Berger, Eric Bishop-von Wettberg, Abdullah
 Kahraman, Abdulkadir Aydogan, Douglas Cook, Sergey Nuzhdin, and Maria Samsonova.
 “Non-Linear Regression Models for Time to Flowering in Wild Chickpea Combine
