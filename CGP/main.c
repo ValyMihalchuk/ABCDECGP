@@ -255,6 +255,9 @@ struct dataSet *trainingData_right,
 		for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
 			errors_chromo[j] = levelCoeff * errors_chromo_left[j] * errors_chromo_right[j];
 		}
+
+		fprintf(STDOUT_, "NUM SAMPLES %i \n", getDataSetNumSamples(trainingData_right));
+
 		updateDataSetOutput(trainingData_left, errors_chromo, 1);
 		updateDataSetOutput(trainingData_right, errors_chromo, 1);
 
@@ -375,6 +378,13 @@ void OperOPTB3(
 
 	getResult(trainingData_right, errors_chromo, chromo, levelCoeff);
 
+
+	/**/
+	double tmptmptmp = 0;
+	for (int i = 0; i < getDataSetNumSamples(trainingData_right); i++)
+		tmptmptmp += errors_chromo[i];
+	fprintf(STDOUT_, "Only simple model: %lf, total num samples %i\n", tmptmptmp, getDataSetNumSamples(trainingData_right));
+	/**/
 	// updateDataSetOutput(trainingData_left, errors_chromo, 1);
 	// updateDataSetOutput(trainingData_right, errors_chromo, 1);
 
@@ -415,10 +425,24 @@ void OperOPTB3(
 
 	double sum = 0;
 	for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
-		sum += errors_chromo[j];
-		//fprintf(STDOUT_, "%4d, %13.6lf, %13.6lf\n", j, errors_chromo[j], getDataSetSampleOutput(trainingData_right, j, 0));
+		sum += fabs(errors_chromo[j] - getDataSetSampleOutput(trainingData_right, j, 0));
+		fprintf(STDOUT_, "%4d, %13.6lf, %13.6lf\n", j, errors_chromo[j], getDataSetSampleOutput(trainingData_right, j, 0));
 	}
 	printf(":%lf", sum / getDataSetNumSamples(trainingData_right));
+
+
+	double* real = (double*)calloc(getDataSetNumSamples(trainingData_right), sizeof(double));
+	for (int i = 0; i < getDataSetNumSamples(trainingData_right); i++)
+		real[i] = getDataSetSampleOutput(trainingData_right, i, 0);
+	double SS_tot_ = SS_tot(real, getDataSetNumSamples(trainingData_right));
+
+
+	double* err = (double*)calloc(getDataSetNumSamples(trainingData_right), sizeof(double));
+	for (int i = 0; i < getDataSetNumSamples(trainingData_right); i++)
+		err[i] = fabs(errors_chromo[i] - getDataSetSampleOutput(trainingData_right, i, 0));
+	double SS_res_ = SS_res(err, getDataSetNumSamples(trainingData_right));
+	fprintf(STDOUT_, "\nR^2: %lf\n", 1 - SS_res_ / SS_tot_);
+
 	freeParameters(paramsLeft);
 	freeParameters(paramsRight);
 	freeDataSet(trainingData_left);
@@ -934,6 +958,7 @@ int main(int argc, char** argv) {
 			freeChromosome(chromo_right);
 		}
 
+		//fprintf(STDOUT_, "NUM SAMPLES %i \n", getDataSetNumSamples(trainingData_right));
 		for (int j = 0; j < getDataSetNumSamples(trainingData_right); j++) {
 			fprintf(STDOUT_, "%4d, %13.6lf, %13.6lf\n", j, errors_chromo[j], getDataSetSampleOutput(trainingData_right, j, 0));
 		}
